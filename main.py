@@ -19,7 +19,6 @@ COLOR_ORANGE = (255, 165, 0)
 
 main_display =  pygame.display.set_mode((WIDTH, HEIGHT))
 
-# creates player
 player_size = (20, 20)
 player = pygame.Surface(player_size)
 player.fill(COLOR_BLUE)
@@ -29,7 +28,6 @@ player_move_right = [1, 0]
 player_move_top = [0, -1]
 player_move_left = [-1, 0]
 
-# creates enemies
 def create_enemy():
    enemy_size = (30, 30)
    enemy = pygame.Surface(enemy_size)
@@ -43,19 +41,16 @@ pygame.time.set_timer(CREATE_ENEMY, 1000)
 
 enemies = []
 
-# creates bonuses
-
 def create_bonus():
    bonus_size = (25, 25)
    bonus = pygame.Surface(bonus_size)
-   bonus_rect = pygame.Rect(WIDTH, random.randint(0, HEIGHT), *bonus_size)
+   bonus_rect = pygame.Rect(random.randint(0, WIDTH - bonus_size[0]), 0, *bonus_size)
    bonus.fill(COLOR_WHITE)
-   bonus_move = [0, random.randint(0, 6)]
-  
+   bonus_move = [0, random.randint(1, 6)]
    return [bonus, bonus_rect, bonus_move]
 
 CREATE_BONUS = pygame.USEREVENT + 2
-pygame.time.set_timer(CREATE_BONUS, 750) 
+pygame.time.set_timer(CREATE_BONUS, 1000) 
 
 bonuses = []
 
@@ -71,8 +66,7 @@ while playing:
          enemies.append(create_enemy())
       if event.type == CREATE_BONUS:
          bonuses.append(create_bonus())
-        
-    
+
    main_display.fill(COLOR_GREEN)
 
    keys = pygame.key.get_pressed()
@@ -92,12 +86,10 @@ while playing:
    for enemy in enemies:
       enemy[1] = enemy[1].move(enemy[2])
       main_display.blit(enemy[0], enemy[1])
-  
+
    for bonus in bonuses:
       bonus[1] = bonus[1].move(bonus[2])
       main_display.blit(bonus[0], bonus[1])
-  
-   print(len(bonuses))
 
    main_display.blit(player, player_rect)
 
@@ -106,5 +98,10 @@ while playing:
    for enemy in enemies:
       if enemy[1].left < 0:
          enemies.pop(enemies.index(enemy))
+
+   for bonus in bonuses:
+      if bonus[1].bottom > HEIGHT:
+         bonuses.pop(bonuses.index(bonus))
+
 
 pygame.quit()
