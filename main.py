@@ -7,8 +7,8 @@ pygame.init()
 
 FPS = pygame.time.Clock()
 
-HEIGHT = 400
-WIDTH = 600
+HEIGHT = 600
+WIDTH = 1200
 
 COLOR_WHITE = (255, 255, 255)
 COLOR_BLACK = (0, 0, 0)
@@ -28,13 +28,19 @@ player_move_right = [1, 0]
 player_move_top = [0, -1]
 player_move_left = [-1, 0]
 
+def create_enemy():
+   enemy_size = (30, 30)
+   enemy = pygame.Surface(enemy_size)
+   enemy_rect = pygame.Rect(WIDTH, random.randint(0, (HEIGHT - enemy_size[0])), *enemy_size)
+   enemy.fill(COLOR_BLACK)
+   enemy_move = [random.randint(-6, -1), 0]
+   return [enemy, enemy_rect, enemy_move]
 
-enemy_size = (30, 30)
-enemy = pygame.Surface(enemy_size)
-enemy_rect = pygame.Rect(WIDTH, 100, *enemy_size)
-print(enemy_rect)
-enemy.fill(COLOR_BLACK)
-enemy_move = [-1, 0]
+CREATE_ENEMY = pygame.USEREVENT + 1
+pygame.time.set_timer(CREATE_ENEMY, 1000)
+
+
+enemies = []
 
 playing = True
 
@@ -43,6 +49,8 @@ while playing:
    for event in pygame.event.get():
       if event.type == QUIT:
          playing = False
+      if event.type == CREATE_ENEMY:
+         enemies.append(create_enemy())
     
    main_display.fill(COLOR_GREEN)
 
@@ -60,28 +68,17 @@ while playing:
    if keys[K_LEFT] and player_rect.left > 0:
       player_rect = player_rect.move(player_move_left)
 
-   enemy_rect = enemy_rect.move(enemy_move)
-
-   # if player_rect.bottom >= HEIGHT:
-   #    player_speed = random.choice(([1, -1], [-1, -1])) 
-   
-   # if player_rect.top <= 0:
-   #    player_speed = random.choice(([-1, 1], [1, 1])) 
-    
-   # if player_rect.right >= WIDTH: 
-   #    player_speed = random.choice(([-1, -1], [-1, 1]))
-      
-   # if player_rect.left <= 0: 
-   #    player_speed = random.choice(([1, 1], [1, -1]))
-      
-      
+   for enemy in enemies:
+      enemy[1] = enemy[1].move(enemy[2])
+      main_display.blit(enemy[0], enemy[1])
+  
+     
    main_display.blit(player, player_rect)
 
-  
-   main_display.blit(enemy, enemy_rect)
-
-   # player_rect = player_rect.move(player_speed)
-   
    pygame.display.flip()
+
+   for enemy in enemies:
+      if enemy[1].left < 0:
+         enemies.pop(enemies.index(enemy))
 
 pygame.quit()
